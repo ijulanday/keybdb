@@ -51,6 +51,7 @@ void loop() {
 
         if (mykeybdb.receivedChar == 's' && mykeybdb.lastChar == 'm') {
             // set servo mode
+            turnCount = 0;
             servomode = 's';
             mykeybdb.clear();
             REG_RUN_MODE(id, 1, &can1);
@@ -84,13 +85,13 @@ void loop() {
                     pos = decodePositionLo(msg);
                 REG_POSITION_NEW(id, pos + 15, &can1); 
                 mykeybdb.clear();
-                Serial.print("Rotated left 15 degrees...");               
+                Serial.print("Rotated right 15 degrees...");               
             } else {
                 turnCount += 1;
                 REG_TURN_NEW(id, turnCount, &can1);
                 delay(20);
                 mykeybdb.clear();
-                Serial.print("Did a full rotation left... ("); Serial.print(turnCount); Serial.print(")");
+                Serial.print("Did a full rotation right... ("); Serial.print(turnCount); Serial.print(")");
             }
         }
 
@@ -103,13 +104,13 @@ void loop() {
                     pos = decodePositionLo(msg);
                 REG_POSITION_NEW(id, pos - 15, &can1);    
                 mykeybdb.clear();
-                Serial.print("Rotated right 15 degrees...");             
+                Serial.print("Rotated left 15 degrees...");             
             } else {
                 turnCount -= 1;
                 REG_TURN_NEW(id, turnCount, &can1);
                 delay(20);
                 mykeybdb.clear();
-                Serial.print("Did a full rotation right... ("); Serial.print(turnCount); Serial.print(")");
+                Serial.print("Did a full rotation left... ("); Serial.print(turnCount); Serial.print(")");
             }
         }
     }
