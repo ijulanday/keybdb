@@ -7,6 +7,7 @@ char servomode = 's';
 char id = 0x00;
 int pos;
 int posNext;
+int turnCount = 0;
 
 KeyBDB mykeybdb(Serial);
 
@@ -25,6 +26,11 @@ void setup() {
     delay(20);
     REG_POWER_CONFIG(id, &can1);
     delay(200);
+
+    REG_TURN_COUNT(id, &can1);
+    delay(20);
+    if (can1.read(msg))
+        turnCount = decodeTurnCount(msg);
 
     Serial.println("\n--- Commands ---");
     Serial.println("m ... change mode");
@@ -69,7 +75,7 @@ void loop() {
             Serial.print("Config changed to CONTINUOUS mode!");
         }
 
-        if (mykeybdb.receivedChar == 'q') {
+        if (mykeybdb.receivedChar == 'e') {
             // left rotate stuff
             if (servomode == 's') {
                 REG_32BITS_POSITION_L(id, &can1);
@@ -80,13 +86,15 @@ void loop() {
                 mykeybdb.clear();
                 Serial.print("Rotated left 15 degrees...");               
             } else {
-                REG_TURN_NEW(id, 1, &can1);
+                turnCount += 1;
+                REG_TURN_NEW(id, turnCount, &can1);
+                delay(20);
                 mykeybdb.clear();
-                Serial.print("Did a full rotation left...");
+                Serial.print("Did a full rotation left... ("); Serial.print(turnCount); Serial.print(")");
             }
         }
 
-        if (mykeybdb.receivedChar == 'e') {
+        if (mykeybdb.receivedChar == 'q') {
             // right rotate stuff
             if (servomode == 's') {
                 REG_32BITS_POSITION_L(id, &can1);
@@ -97,9 +105,11 @@ void loop() {
                 mykeybdb.clear();
                 Serial.print("Rotated right 15 degrees...");             
             } else {
-                REG_TURN_NEW(id, -1, &can1);
+                turnCount -= 1;
+                REG_TURN_NEW(id, turnCount, &can1);
+                delay(20);
                 mykeybdb.clear();
-                Serial.print("Did a full rotation right...");
+                Serial.print("Did a full rotation right... ("); Serial.print(turnCount); Serial.print(")");
             }
         }
     }
